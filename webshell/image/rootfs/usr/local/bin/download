@@ -1,0 +1,7 @@
+#!/bin/sh
+# download <file>... — save files from the VM to your computer via the browser
+[ $# -gt 0 ] || { echo "usage: download <file>..." >&2; exit 2; }
+for f in "$@"; do
+  [ -f "$f" ] || { echo "download: $f: not a regular file" >&2; continue; }
+  _outbox download "$(basename -- "$f")" "$f" && echo "download: $f -> browser"
+done

@@ -1,0 +1,17 @@
+#!/bin/sh
+# Early userspace setup (run once by busybox init).
+mnt() { mountpoint -q "$3" 2>/dev/null || { mkdir -p "$3"; mount -t "$1" "$2" "$3"; }; }
+mnt proc proc /proc
+mnt sysfs sys /sys
+mnt devtmpfs dev /dev
+mnt devpts devpts /dev/pts
+mnt tmpfs shm /dev/shm
+mnt tmpfs run /run
+mnt tmpfs tmp /tmp
+chmod 1777 /tmp
+[ -e /dev/fd ] || ln -s /proc/self/fd /dev/fd
+hostname -F /etc/hostname
+modprobe virtio_console 2>/dev/null
+ip link set lo up 2>/dev/null
+# wait for the virtio console device node
+for i in 1 2 3 4 5 6 7 8 9 10; do [ -e /dev/hvc0 ] && break; sleep 0.1; done

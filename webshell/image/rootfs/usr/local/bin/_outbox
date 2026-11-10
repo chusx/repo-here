@@ -1,0 +1,8 @@
+#!/bin/sh
+# usage: _outbox <action> <name> [file]   — atomically drop a request for the browser page
+set -e
+dir=/var/host-outbox
+tmp="$dir/.tmp.$$"
+if [ -n "$3" ]; then cp -- "$3" "$tmp"; else : > "$tmp"; fi
+sync "$tmp" 2>/dev/null || true
+mv -- "$tmp" "$dir/$(date +%s%N).$1.$(printf %s "$2" | tr '/' '_')"

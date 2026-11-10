@@ -1,0 +1,5 @@
+#!/bin/sh
+# hostsave — ask the page to write changes under /mnt/<name> back to the real folders
+sync
+_outbox hostsave all
+echo "hostsave: requested (the browser will ask you to confirm)"
