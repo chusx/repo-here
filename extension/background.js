@@ -45,7 +45,7 @@ function cwdFromUrl(url) {
   }
 }
 
-chrome.action.onClicked.addListener(async (tab) => {
+async function openTerminal(tab) {
   const cwd = cwdFromUrl(tab.url);
   try {
     await chrome.scripting.executeScript({
@@ -68,7 +68,9 @@ chrome.action.onClicked.addListener(async (tab) => {
       openerTabId: tab.id,
     });
   }
-});
+}
+
+chrome.action.onClicked.addListener(openTerminal);
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   // Only accept messages from our own extension pages (not content scripts).
