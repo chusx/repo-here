@@ -1,7 +1,11 @@
 # Term Here
 
-A Chromium extension that opens a real shell on your machine in a terminal
-overlay on the current page.
+Two ways to get a shell in the browser:
+
+- **Term Here** (this page): a Chromium extension that opens a real shell **on your machine**
+  in a terminal overlay on the current page.
+- **[webshell](webshell/)**: a single-page app that runs Alpine Linux **inside the browser**
+  (WebAssembly), with local folders mounted in. It needs no install and works from `file://`.
 
 Browser extensions can't start processes, so this has two parts:
 

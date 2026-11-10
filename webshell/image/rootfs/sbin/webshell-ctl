@@ -1,0 +1,12 @@
+#!/bin/sh
+# Browser -> guest control channel on the serial port (ttyS0), which the shell doesn't use.
+# The page sends one command per line: "time <epoch>", "seed <hex>", "drop".
+exec </dev/ttyS0 >/dev/null 2>&1
+stty -echo
+while read -r cmd arg; do
+  case "$cmd" in
+    time) date -s "@$arg" ;;
+    seed) printf %s "$arg" > /dev/urandom ;;
+    drop) echo 2 > /proc/sys/vm/drop_caches ;;  # forget cached dentries so host mount changes show up
+  esac
+done

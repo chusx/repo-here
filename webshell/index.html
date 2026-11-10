@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>webshell</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="vendor/xterm.css">
+  <style>
+    :root {
+      --bg: #16181d; --panel: #1f2229; --line: #2c313a; --fg: #d7dae0; --dim: #8b93a1;
+      --accent: #4fb3ff; --ok: #5ccf7a; --warn: #e8b04a; --bad: #ef6b6b;
+      font: 13px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--fg);
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; background: var(--bg); overflow: hidden; }
+    body { display: flex; flex-direction: column; }
+
+    header {
+      flex: none; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+      padding: 6px 10px; background: var(--panel); border-bottom: 1px solid var(--line);
+    }
+    .brand { font-weight: 600; letter-spacing: .2px; }
+    .brand small { color: var(--dim); font-weight: 400; margin-left: 6px; }
+    #status { color: var(--dim); display: flex; align-items: center; gap: 6px; }
+    #status::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--warn); }
+    #status.ok::before { background: var(--ok); }
+    #status.bad::before { background: var(--bad); }
+    .spacer { flex: 1; }
+    button, .btn {
+      font: inherit; color: var(--fg); background: #2a2f38; border: 1px solid #3a404b;
+      border-radius: 6px; padding: 4px 10px; cursor: pointer;
+    }
+    button:hover { background: #333944; }
+    button:disabled { opacity: .5; cursor: default; }
+    button.primary { background: #1d4f78; border-color: #2b6ea3; }
+    button.primary:hover { background: #235d8c; }
+
+    #mounts { display: flex; gap: 6px; flex-wrap: wrap; }
+    .mount {
+      display: flex; align-items: center; gap: 6px; padding: 2px 4px 2px 8px;
+      border: 1px solid var(--line); border-radius: 6px; background: #1a1d23;
+    }
+    .mount code { color: var(--accent); }
+    .mount .dirty { color: var(--warn); }
+    .mount .ro { color: var(--dim); }
+    .mount button { padding: 1px 7px; font-size: 12px; }
+
+    main { flex: 1; position: relative; min-height: 0; }
+    #term { position: absolute; inset: 6px 4px 4px 10px; }
+
+    #drop {
+      position: absolute; inset: 10px; display: none; place-items: center; z-index: 5;
+      border: 2px dashed var(--accent); border-radius: 12px; background: rgba(22,24,29,.85);
+      font-size: 16px; pointer-events: none; text-align: center;
+    }
+    body.dragging #drop { display: grid; }
+
+    #toasts { position: fixed; right: 14px; bottom: 14px; display: flex; flex-direction: column; gap: 8px; z-index: 10; }
+    .toast {
+      max-width: 420px; padding: 10px 12px; border-radius: 8px; background: #262a33;
+      border: 1px solid #3a404b; box-shadow: 0 8px 30px rgba(0,0,0,.4);
+      display: flex; gap: 10px; align-items: center;
+    }
+    .toast.err { border-color: #7a3434; }
+    .toast .msg { flex: 1; white-space: pre-wrap; word-break: break-word; }
+    .toast a { color: var(--accent); }
+
+    dialog {
+      color: var(--fg); background: var(--panel); border: 1px solid var(--line);
+      border-radius: 10px; max-width: min(640px, 92vw); padding: 16px 18px;
+    }
+    dialog::backdrop { background: rgba(0,0,0,.5); }
+    dialog h3 { margin: 0 0 8px; }
+    dialog pre {
+      max-height: 45vh; overflow: auto; background: #15171c; padding: 8px 10px; border-radius: 6px;
+      font: 12px/1.5 ui-monospace, Menlo, Consolas, monospace;
+    }
+    dialog .row { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
+    .add { color: var(--ok); } .mod { color: var(--warn); } .del { color: var(--bad); }
+  </style>
+</head>
+<body>
+  <header>
+    <span class="brand">webshell<small>Linux in your browser</small></span>
+    <span id="status">Loading…</span>
+    <div id="mounts"></div>
+    <span class="spacer"></span>
+    <button id="btn-mount" title="Mount a folder from your computer at /mnt/<name>">Mount folder…</button>
+    <button id="btn-upload" title="Copy files into /root">Upload files…</button>
+    <button id="btn-save" class="primary" disabled title="Write VM changes back to mounted folders">Save to disk</button>
+    <input id="pick-files" type="file" multiple hidden>
+    <input id="pick-dir" type="file" webkitdirectory hidden>
+  </header>
+  <main>
+    <div id="term"></div>
+    <div id="drop">Drop a <b>folder</b> to mount it at /mnt/&lt;name&gt;<br>or <b>files</b> to copy them into /root</div>
+  </main>
+  <div id="toasts"></div>
+  <dialog id="save-dialog">
+    <h3>Write changes to your computer?</h3>
+    <pre id="save-list"></pre>
+    <div class="row">
+      <button value="cancel" id="save-cancel">Cancel</button>
+      <button value="ok" id="save-ok" class="primary">Write changes</button>
+    </div>
+  </dialog>
+
+  <script src="vendor/xterm.js"></script>
+  <script src="vendor/addon-fit.js"></script>
+  <script src="vendor/libv86.js"></script>
+  <script src="vm-config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

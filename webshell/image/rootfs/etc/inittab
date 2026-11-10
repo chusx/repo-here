@@ -1,5 +1,6 @@
-# busybox init — no OpenRC, so the shell is up a few seconds after the kernel.
+# busybox init — no OpenRC, so the shell is up seconds after the kernel.
 ::sysinit:/sbin/webshell-init
-hvc0::respawn:/sbin/agetty --autologin root --noclear -L hvc0 115200 xterm-256color
+hvc0::respawn:/bin/login -f root
+::respawn:/sbin/webshell-ctl
 ::ctrlaltdel:/sbin/reboot
 ::shutdown:/bin/umount -a -r

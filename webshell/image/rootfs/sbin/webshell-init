@@ -10,7 +10,8 @@ mnt tmpfs run /run
 mnt tmpfs tmp /tmp
 chmod 1777 /tmp
 [ -e /dev/fd ] || ln -s /proc/self/fd /dev/fd
-hostname -F /etc/hostname
+hostname webshell
+printf "127.0.0.1 localhost webshell\n::1 localhost\n" > /etc/hosts
 modprobe virtio_console 2>/dev/null
 ip link set lo up 2>/dev/null
 # wait for the virtio console device node

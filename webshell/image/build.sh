@@ -15,3 +15,7 @@ docker export "$IMAGE-export" -o "$TMP/rootfs.tar"
 rm -rf "$OUT"
 python3 pack.py "$TMP/rootfs.tar" --out "$OUT"
 du -sh "$OUT"
+
+echo "Booting once to save a snapshot (makes the page start in seconds)…"
+node build-state.mjs
+du -sh "$OUT"

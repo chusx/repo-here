@@ -2,16 +2,16 @@
 FROM docker.io/i386/alpine:3.21
 
 RUN apk add --no-cache \
-      linux-virt linux-firmware-none mkinitfs agetty util-linux-misc \
+      linux-virt linux-firmware-none mkinitfs util-linux-misc \
       bash bash-completion coreutils findutils grep sed gawk diffutils patch \
       less file tree ncurses procps-ng psmisc htop \
       vim nano jq bc tar gzip xz bzip2 zip unzip \
       python3 git sqlite ripgrep fd make xxd man-pages \
  && sed -i 's#^root:.*#root::0:0:root:/root:/bin/bash#' /etc/passwd \
- && echo webshell > /etc/hostname \
  && mkinitfs -F "base virtio 9p" "$(cat /usr/share/kernel/virt/kernel.release)"
 
 COPY rootfs/ /
-RUN chmod +x /sbin/webshell-init /usr/local/bin/* \
+RUN chmod +x /sbin/webshell-init /sbin/webshell-ctl /usr/local/bin/* \
+ && rm -f /etc/motd && : > /etc/issue \
  && mkdir -p /var/host-outbox /mnt \
  && rm -rf /var/cache/apk/* /usr/share/apk
