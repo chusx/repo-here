@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "Term Here",
+  "version": "0.1.0",
+  "description": "Open a shell on this machine in a terminal overlay on the current page.",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1746bdzkq1kDIWgE5Vsity3nD0GRkkweP4TN7tcNX437zq70YkDwgSqJnBhAB+ANefQ7QnHeUY8p6M17pp5o2eJuAg1a2y1n+CszWf9zctrgyWrldzGQQtbGkxwCUOsKlEC+QqeOvDc/fVT1lRI4DjGtc2NvV7A0emX0STKohm1K+AjOifaqDHxp1EUDdTCmE3JxaEk8uI2FNIDrnJSYwQUKrVHovT0BHtfKDgrd99bWp1mWiVMNP6F8EU8yWeqxSMrUdocIM1n4P4oDXzAd99KPLnjdI9YtLVxLbOC45LLTUwZhrgSvfQZeezlBAddjseoTC3BmTxruMjn4ewvqdwIDAQAB",
+  "minimum_chrome_version": "116",
+  "permissions": ["nativeMessaging", "activeTab", "scripting", "storage"],
+  "background": { "service_worker": "background.js" },
+  "action": { "default_title": "Toggle terminal (Alt+T)" },
+  "commands": {
+    "_execute_action": { "suggested_key": { "default": "Alt+T" } }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["terminal.html"],
+      "matches": ["<all_urls>"],
+      "use_dynamic_url": true
+    }
+  ]
+}
