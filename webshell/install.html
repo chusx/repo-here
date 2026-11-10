@@ -32,7 +32,6 @@
 
   <div class="downloads">
     <a class="dl" href="term-here.zip" download>term-here.zip</a>
-    <a class="dl secondary" href="term-here.crx" download>term-here.crx</a>
     <a class="dl secondary" href="SHA256SUMS">SHA256SUMS</a>
   </div>
   <p class="dim">Extension ID <code>ipldffceopngiolfclkimmjkbgapjnfp</code>. Linux and macOS, Chrome, Edge, Brave, Chromium or Vivaldi, with <code>python3</code>.</p>
@@ -50,19 +49,25 @@ cd term-here
     the browser runs the helpers from it. Undo with <code>./install.sh --uninstall</code>.</p>
 
   <h2>2. Add the extension</h2>
-  <p><b>Any OS (recommended):</b> open <code>chrome://extensions</code>, turn on <b>Developer mode</b>,
+  <p>Open <code>chrome://extensions</code>, turn on <b>Developer mode</b>,
     click <b>Load unpacked</b>, and choose <code>term-here/extension</code>.</p>
-  <p><b>Or the .crx, on Linux:</b> with Developer mode on, drag <code>term-here.crx</code> onto <code>chrome://extensions</code>.</p>
-  <p class="note">On Windows and macOS, Chrome refuses <code>.crx</code> files from outside the Chrome Web Store
-    unless an administrator allows them by policy: <code>ExtensionInstallForcelist</code> with
-    <code>ipldffceopngiolfclkimmjkbgapjnfp;https://caselight.io/shell/updates.xml</code>.
-    Use <b>Load unpacked</b> there.</p>
 
   <h2>3. Allow webshell</h2>
   <p>Open <a href="./">webshell</a>. Term Here asks once whether this site may access your files. Click <b>Allow</b>.
     The header then shows <i>Host files: /host · file:///</i>. You can revoke access in the extension's options.</p>
   <p class="dim">Opening webshell from a local copy (<code>file://</code>)? Also enable <b>Allow access to file URLs</b>
     on Term Here's details page.</p>
+
+  <h2>About the .crx</h2>
+  <p class="note">Don't drag <a href="term-here.crx">term-here.crx</a> into Chrome. It isn't from the Chrome Web Store,
+    so Chrome rejects it with <code>CRX_REQUIRED_PROOF_MISSING</code> on every OS. Use <b>Load unpacked</b> above.</p>
+  <p class="dim">The .crx is for managed browsers. Chrome only installs self-hosted extensions through admin policy.
+    On Linux, as root, create <code>/etc/opt/chrome/policies/managed/term-here.json</code>
+    (Chromium: <code>/etc/chromium/policies/managed/</code>):</p>
+  <pre>{ "ExtensionInstallForcelist": ["ipldffceopngiolfclkimmjkbgapjnfp;https://caselight.io/shell/updates.xml"] }</pre>
+  <p class="dim">Chrome then installs it from <a href="updates.xml">updates.xml</a> and keeps it updated.
+    On Windows and macOS this policy only applies to managed devices (Group Policy / configuration profile).
+    You still need step 1 for the helper.</p>
 
   <p class="dim">Source: <a href="https://github.com/chusx/repo-here">github.com/chusx/repo-here</a></p>
 </main>

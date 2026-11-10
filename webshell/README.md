@@ -20,7 +20,8 @@ a page can work around. So host access goes through the [Term Here](../README.md
 and its native helper, which runs as your user:
 
 1. Run `./install.sh` from the repo root, then load `extension/` unpacked in Chrome/Edge/Brave.
-   (Or use the published bundle: `term-here.zip` / `term-here.crx`, see `install.html`. Build them with `../package.sh`.)
+   (Or use the published bundle `term-here.zip` the same way, see `install.html`. Build it with `../package.sh`.
+   The `.crx` only installs through Chrome admin policy. Dragging it in fails with `CRX_REQUIRED_PROOF_MISSING`.)
 2. Open webshell. Term Here asks **once per site** whether to allow it. Revoke in the extension's options.
 3. To open webshell from `file://`, also enable **Allow access to file URLs** for Term Here.
 
