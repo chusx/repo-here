@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Register the Term Here native messaging host with Chromium-based browsers.
+# Register the Term Here native messaging hosts with Chromium-based browsers.
 #
 #   ./install.sh                 install for every browser found
 #   ./install.sh --uninstall     remove the registration
@@ -9,7 +9,11 @@
 # unpacked extension from any path yields the same ID.
 set -euo pipefail
 
-HOST_NAME="com.termhere.shell"
+# name | script | description
+HOSTS=(
+  "com.termhere.shell|host/term_here_host.py|Term Here shell host"
+  "com.termhere.fs|host/term_here_fs.py|Term Here filesystem host (host files for webshell)"
+)
 EXT_ID="ipldffceopngiolfclkimmjkbgapjnfp"
 UNINSTALL=0
 
@@ -24,7 +28,6 @@ while [[ $# -gt 0 ]]; do
 done
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-HOST_PATH="$REPO_DIR/host/term_here_host.py"
 
 if [[ "$(uname)" == "Darwin" ]]; then
   BASE="$HOME/Library/Application Support"
@@ -42,30 +45,26 @@ fi
 
 if [[ $UNINSTALL -eq 0 ]]; then
   command -v python3 >/dev/null || { echo "python3 is required" >&2; exit 1; }
-  chmod +x "$HOST_PATH"
+  chmod +x "$REPO_DIR"/host/*.py
 fi
 
 count=0
 for b in "${BROWSERS[@]}"; do
   dir="$BASE/$b"
   [[ -d "$dir" ]] || continue
-  target="$dir/NativeMessagingHosts/$HOST_NAME.json"
-  if [[ $UNINSTALL -eq 1 ]]; then
-    [[ -f "$target" ]] && rm -f "$target" && echo "removed  $target" && count=$((count+1))
-    continue
-  fi
-  mkdir -p "$dir/NativeMessagingHosts"
-  cat > "$target" <<EOF
-{
-  "name": "$HOST_NAME",
-  "description": "Term Here shell host",
-  "path": "$HOST_PATH",
-  "type": "stdio",
-  "allowed_origins": ["chrome-extension://$EXT_ID/"]
-}
-EOF
-  echo "installed $target"
   count=$((count+1))
+  for spec in "${HOSTS[@]}"; do
+    IFS='|' read -r name script desc <<< "$spec"
+    target="$dir/NativeMessagingHosts/$name.json"
+    if [[ $UNINSTALL -eq 1 ]]; then
+      if [[ -f "$target" ]]; then rm -f "$target"; echo "removed   $target"; fi
+      continue
+    fi
+    mkdir -p "$dir/NativeMessagingHosts"
+    printf '{\n  "name": "%s",\n  "description": "%s",\n  "path": "%s",\n  "type": "stdio",\n  "allowed_origins": ["chrome-extension://%s/"]\n}\n' \
+      "$name" "$desc" "$REPO_DIR/$script" "$EXT_ID" > "$target"
+    echo "installed $target"
+  done
 done
 
 if [[ $count -eq 0 ]]; then
@@ -81,5 +80,7 @@ Next:
   1. Open chrome://extensions, enable Developer mode
   2. "Load unpacked" -> $REPO_DIR/extension
   3. Click the Term Here toolbar button (or press Alt+T) on any page
+  4. For webshell with host files: open it, approve the site once.
+     For webshell opened from file://, also enable "Allow access to file URLs" for Term Here.
 EOF
 fi
