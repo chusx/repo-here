@@ -7,7 +7,7 @@ Two ways to get a shell in the browser:
 - **[webshell](webshell/)**: a single-page app that runs Alpine Linux **inside the browser**
   (WebAssembly), with local folders mounted in. It needs no install and works from `file://`.
 
-Browser extensions can't start processes, so this has two parts:
+Browser extensions can't start processes, so Term Here has two parts:
 
 | Part | What it does |
 | --- | --- |
