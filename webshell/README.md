@@ -5,12 +5,17 @@ Alpine Linux (i686) runs in the [v86](https://github.com/copy/v86) WebAssembly e
 with bash, coreutils, grep/sed/awk, vim/nano, less, python3, git, sqlite, ripgrep, fd, jq, make…
 There's no server and nothing to install. It works opened straight from disk (`file://`) or from any static host.
 
+**Live: https://nat444.com/repo-here/** (GitHub Pages, served from the `gh-pages` branch)
+
 ## Run
 
 ```sh
 image/build.sh                 # once: builds the OS image into os/ (needs Docker + Node + Python)
 xdg-open index.html            # or: python3 -m http.server, then visit http://localhost:8000
 ```
+
+To update the live site, rebuild, then commit the contents of `webshell/` (minus `image/`, plus an empty
+`.nojekyll`) as the root of the `gh-pages` branch.
 
 The shell is ready in ~3 s: the build boots the VM once and saves a snapshot (`os/state.js`)
 that the page restores. Without the snapshot the page cold-boots, which takes about a minute.
