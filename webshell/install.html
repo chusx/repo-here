@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Install Term Here: host file access for webshell</title>
+  <link rel="icon" href="data:,">
+  <style>
+    :root { --bg: #16181d; --panel: #1f2229; --line: #2c313a; --fg: #d7dae0; --dim: #8b93a1; --accent: #4fb3ff; --warn: #e8b04a; }
+    body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; }
+    main { max-width: 760px; margin: 0 auto; padding: 32px 22px 60px; }
+    h1 { font-size: 24px; margin: 0 0 6px; }
+    h2 { font-size: 17px; margin: 30px 0 8px; }
+    p.lede { color: var(--dim); margin-top: 0; }
+    a { color: var(--accent); }
+    code, pre { font: 13px/1.5 ui-monospace, Menlo, Consolas, monospace; }
+    code { background: #23272f; padding: 1px 5px; border-radius: 4px; }
+    pre { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; overflow-x: auto; }
+    ol li { margin: 6px 0; }
+    .downloads { display: flex; gap: 10px; flex-wrap: wrap; margin: 14px 0; }
+    .dl { display: inline-block; padding: 8px 14px; border-radius: 8px; background: #1d4f78; border: 1px solid #2b6ea3; color: #fff; text-decoration: none; }
+    .dl.secondary { background: #2a2f38; border-color: #3a404b; }
+    .note { border-left: 3px solid var(--warn); padding: 4px 12px; color: #cfc6b0; background: #211f1a; border-radius: 0 6px 6px 0; }
+    .dim { color: var(--dim); font-size: 13px; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Install Term Here</h1>
+  <p class="lede">Gives <a href="./">webshell</a> access to your computer's files: <code>cat file:///etc/hosts</code>,
+    <code>/host/…</code>. It also adds a real terminal (Alt+T) on any page.</p>
+
+  <div class="downloads">
+    <a class="dl" href="term-here.zip" download>term-here.zip</a>
+    <a class="dl secondary" href="term-here.crx" download>term-here.crx</a>
+    <a class="dl secondary" href="SHA256SUMS">SHA256SUMS</a>
+  </div>
+  <p class="dim">Extension ID <code>ipldffceopngiolfclkimmjkbgapjnfp</code>. Linux and macOS, Chrome, Edge, Brave, Chromium or Vivaldi, with <code>python3</code>.</p>
+
+  <p>A web page can't read your files by itself. Browsers block that. So there are two pieces:
+    the browser extension, and a small helper program that the extension talks to. The helper runs as your user.
+    Both are needed.</p>
+
+  <h2>1. Install the helper</h2>
+  <pre>unzip term-here.zip
+cd term-here
+./install.sh</pre>
+  <p class="dim">Registers two native-messaging helpers (<code>host/term_here_fs.py</code> for files,
+    <code>host/term_here_host.py</code> for the terminal) with every Chromium-based browser it finds. Keep the folder:
+    the browser runs the helpers from it. Undo with <code>./install.sh --uninstall</code>.</p>
+
+  <h2>2. Add the extension</h2>
+  <p><b>Any OS (recommended):</b> open <code>chrome://extensions</code>, turn on <b>Developer mode</b>,
+    click <b>Load unpacked</b>, and choose <code>term-here/extension</code>.</p>
+  <p><b>Or the .crx, on Linux:</b> with Developer mode on, drag <code>term-here.crx</code> onto <code>chrome://extensions</code>.</p>
+  <p class="note">On Windows and macOS, Chrome refuses <code>.crx</code> files from outside the Chrome Web Store
+    unless an administrator allows them by policy: <code>ExtensionInstallForcelist</code> with
+    <code>ipldffceopngiolfclkimmjkbgapjnfp;https://caselight.io/shell/updates.xml</code>.
+    Use <b>Load unpacked</b> there.</p>
+
+  <h2>3. Allow webshell</h2>
+  <p>Open <a href="./">webshell</a>. Term Here asks once whether this site may access your files. Click <b>Allow</b>.
+    The header then shows <i>Host files: /host · file:///</i>. You can revoke access in the extension's options.</p>
+  <p class="dim">Opening webshell from a local copy (<code>file://</code>)? Also enable <b>Allow access to file URLs</b>
+    on Term Here's details page.</p>
+
+  <p class="dim">Source: <a href="https://github.com/chusx/repo-here">github.com/chusx/repo-here</a></p>
+</main>
+</body>
+</html>

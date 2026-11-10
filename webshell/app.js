@@ -298,7 +298,7 @@ term.onResize(() => shellUp && sendResize());
 
 /* ------------------------------------------------------- host files --- */
 
-const HOSTFS_HELP = "https://github.com/chusx/repo-here#install";
+const HOSTFS_HELP = "install.html";
 let hostfs = null;
 
 function setHostState(state, detail) {
