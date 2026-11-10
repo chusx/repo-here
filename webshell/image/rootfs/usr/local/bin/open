@@ -1,11 +1,10 @@
 #!/bin/sh
-# open <file|file://path|http(s)://url> — show a VM file (html, image, pdf, text...) or a URL in a browser tab
-[ $# -eq 1 ] || { echo "usage: open <file|file://path|url>" >&2; exit 2; }
-target=$1
-case "$target" in
-  file://*) target=$(printf %s "${target#file://}" | sed 's/%20/ /g') ;;
+# open <file|url> — show a file (html, image, pdf, text...) or an http(s) URL in a new browser tab.
+# file:///path works too and refers to your computer's files (same as /host/path).
+[ $# -eq 1 ] || { echo "usage: open <file|url>" >&2; exit 2; }
+case "$1" in
   http://*|https://*)
-    tmp=$(mktemp) && printf %s "$target" > "$tmp" && _outbox openurl url "$tmp"; rc=$?; rm -f "$tmp"; exit $rc ;;
+    tmp=$(mktemp) && printf %s "$1" > "$tmp" && _outbox openurl url "$tmp"; rc=$?; rm -f "$tmp"; exit $rc ;;
 esac
-[ -f "$target" ] || { echo "open: $target: not a regular file" >&2; exit 1; }
-_outbox open "$(basename -- "$target")" "$target"
+[ -f "$1" ] || { echo "open: $1: not a regular file" >&2; exit 1; }
+_outbox open "$(basename -- "$1")" "$1"

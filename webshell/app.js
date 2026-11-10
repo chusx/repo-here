@@ -6,9 +6,9 @@ const S_IFMT = 0xf000, S_IFREG = 0x8000, S_IFDIR = 0x4000;
 const STATUS_ON_STORAGE = 2;
 const OUTBOX = "/var/host-outbox";
 const GREETING =
-  "\x1b[1mwebshell\x1b[0m — Alpine Linux running in your browser (v86). Everything runs locally in this tab.\r\n" +
-  "  Folders: \x1b[36mMount folder…\x1b[0m or drop one here → /mnt/<name>, then \x1b[36mhostsave\x1b[0m / Save to disk to write back\r\n" +
-  "  \x1b[36mdownload\x1b[0m <file>   \x1b[36mopen\x1b[0m <file|file://path|url>   copy: select + Ctrl+Shift+C\r\n";
+  "\x1b[1mwebshell\x1b[0m — Alpine Linux running in your browser (v86).\r\n" +
+  "  Your computer's files: \x1b[36m/host/…\x1b[0m or \x1b[36mfile:///…\x1b[0m  (e.g. cat file:///etc/hosts) — needs the Term Here extension\r\n" +
+  "  \x1b[36mdownload\x1b[0m <file>   \x1b[36mopen\x1b[0m <file|url>   copy: select + Ctrl+Shift+C\r\n";
 
 /* ---------------------------------------------------------------- loading ---
  * All payloads are JS files calling __webshell.<fn>(...), so they load with
@@ -247,6 +247,7 @@ async function boot() {
       syncGuest();
       setStatus("Running", "ok");
       startOutboxPolling();
+      startHostFS();
     }
     term.write(bytes);
   });
@@ -294,6 +295,41 @@ function sendResize() {
   emulator?.bus.send("virtio-console0-resize", [term.cols, term.rows]);
 }
 term.onResize(() => shellUp && sendResize());
+
+/* ------------------------------------------------------- host files --- */
+
+const HOSTFS_HELP = "https://github.com/chusx/repo-here#install";
+let hostfs = null;
+
+function setHostState(state, detail) {
+  const el = $("#hostfs");
+  const text = {
+    checking: "Host files: connecting…",
+    approval: "Host files: approve access in the Term Here popup",
+    ready: "Host files: /host  ·  file:///",
+    denied: "Host files: denied (click to retry)",
+    absent: "Host files: install the Term Here extension",
+    error: "Host files: disconnected (click to retry)",
+    closed: "Host files: disconnected (click to retry)",
+  }[state] || "Host files: " + state;
+  el.textContent = text;
+  el.className = "hostfs " + state;
+  el.title = state === "absent"
+    ? "Reading your computer's files needs the Term Here extension + its native host. Click for setup."
+    : state === "ready" ? "Your filesystem is at /host; file:///path works as a path in any program." : "";
+  el.onclick = state === "absent" ? () => window.open(HOSTFS_HELP, "_blank")
+    : ["denied", "error", "closed"].includes(state) ? () => { setHostState("checking"); hostfs.bridge.connect(); } : null;
+}
+
+function startHostFS() {
+  if (hostfs || !window.HostFS) return;
+  setHostState("checking");
+  hostfs = HostFS.install(emulator, {
+    onState: setHostState,
+    onError: (msg) => console.warn(msg),
+  });
+  hostfs.ready.then((state) => setHostState(state));
+}
 
 /* ---------------------------------------------------------- 9p helpers --- */
 
@@ -691,7 +727,7 @@ addEventListener("beforeunload", (e) => {
 });
 
 // Test/automation hook.
-W.api = { get emulator() { return emulator; }, mountDirectoryHandle, saveAll, mounts, term, get shellUp() { return shellUp; } };
+W.api = { get emulator() { return emulator; }, get hostfs() { return hostfs; }, mountDirectoryHandle, saveAll, mounts, term, get shellUp() { return shellUp; } };
 
 boot().catch((e) => {
   setStatus("Failed to start", "bad");

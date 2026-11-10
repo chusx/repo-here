@@ -7,8 +7,7 @@ mnt devtmpfs dev /dev
 mnt devpts devpts /dev/pts
 mnt tmpfs shm /dev/shm
 mnt tmpfs run /run
-mnt tmpfs tmp /tmp
-chmod 1777 /tmp
+mkdir -p /tmp && chmod 1777 /tmp   # on 9p (not tmpfs) so file:///… paths resolve from /tmp too
 [ -e /dev/fd ] || ln -s /proc/self/fd /dev/fd
 hostname webshell
 printf "127.0.0.1 localhost webshell\n::1 localhost\n" > /etc/hosts

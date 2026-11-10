@@ -20,7 +20,7 @@ Ops:
   rename path dest
   symlink path target
   chmod  path mode
-  utime  path atime mtime          (seconds; null = now)
+  utime  path [atime] [mtime]      (seconds; null = now; missing = unchanged)
 """
 
 import base64
@@ -30,6 +30,7 @@ import os
 import stat
 import struct
 import sys
+import time
 
 STDIN = sys.stdin.fileno()
 STDOUT = sys.stdout.fileno()
@@ -148,10 +149,11 @@ def op_chmod(req):
 
 
 def op_utime(req):
+    # Missing key: leave unchanged. null: set to now.
     st = os.lstat(req["path"])
-    at = req.get("atime")
-    mt = req.get("mtime")
-    os.utime(req["path"], (st.st_atime if at is None else at, st.st_mtime if mt is None else mt))
+    now = time.time()
+    pick = lambda k, cur: cur if k not in req else (now if req[k] is None else req[k])
+    os.utime(req["path"], (pick("atime", st.st_atime), pick("mtime", st.st_mtime)))
 
 
 OPS = {name[3:]: fn for name, fn in globals().items() if name.startswith("op_")}
