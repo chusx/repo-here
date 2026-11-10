@@ -6,7 +6,6 @@ Two ways to get a shell in the browser:
   in a terminal overlay on the current page.
 - **[webshell](webshell/)**: a single-page app that runs Alpine Linux **inside the browser**
   (WebAssembly), with local folders mounted in. It needs no install and works from `file://`.
-  **Try it: https://nat444.com/repo-here/**
 
 Browser extensions can't start processes, so Term Here has two parts:
 
